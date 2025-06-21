@@ -6,19 +6,37 @@
 
 ```
 qwen3/
-├── README.md                 # 本文档
+├── README.md                 # 项目主文档
+├── requirements.txt         # 依赖包列表
 ├── Qwen3-0.6B/              # 模型文件目录
 │   ├── config.json
 │   ├── model.safetensors
 │   ├── tokenizer.json
 │   └── ...
 ├── qwen-env/                # Python 虚拟环境
-├── test.py                  # 传统 Transformers 推理脚本
-├── final_test.py            # 优化的 Transformers 推理脚本
-├── final_test_vllm.py       # vLLM API 推理脚本
-├── start_vllm.sh            # vLLM 服务启动脚本
-├── stop_vllm.sh             # vLLM 服务停止脚本
-└── requirements.txt         # 依赖包列表
+├── scripts/                 # 脚本文件
+│   ├── setup.sh             # 环境安装脚本
+│   ├── start_vllm.sh        # vLLM 服务启动脚本
+│   └── stop_vllm.sh         # vLLM 服务停止脚本
+├── tests/                   # 测试文件
+│   ├── test.py              # 传统 Transformers 推理测试
+│   ├── final_test.py        # 优化的 Transformers 推理测试
+│   ├── final_test_vllm.py   # vLLM API 推理测试
+│   ├── debug_test.py        # 调试测试脚本
+│   ├── improved_test.py     # 改进测试脚本
+│   ├── simple_time_test.py  # 简单时间测试
+│   └── test_time_evaluation.py # 时间评估测试
+├── tools/                   # 工具文件
+│   ├── optimized_inference.py  # 优化推理引擎
+│   ├── response_optimizer.py   # 回复质量优化工具
+│   └── mcp_tools/           # MCP 工具调用系统
+│       ├── __init__.py
+│       ├── mcp_client.py    # MCP 客户端
+│       ├── mcp_server.py    # MCP 服务器
+│       ├── requirements.txt # MCP 专用依赖
+│       └── test_mcp.py      # MCP 测试脚本
+└── docs/                    # 文档目录
+    └── git_setup.md         # Git 设置指南
 ```
 
 ## �️ 环境要求
@@ -36,28 +54,7 @@ qwen3/
 
 ## 📦 安装步骤
 
-### 1. 获取模型文件
-
-**重要说明**: 模型文件（Qwen3-0.6B 目录）不包含在此代码仓库中，需要单独下载。
-
-```bash
-# 方法1: 使用 git clone 下载 HuggingFace 模型
-git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct Qwen3-0.6B
-
-# 方法2: 使用 huggingface-cli 下载
-huggingface-cli download Qwen/Qwen2.5-0.5B-Instruct --local-dir Qwen3-0.6B
-
-# 下载完成后，删除模型目录中的 Git 信息（避免与主项目冲突）
-rm -rf Qwen3-0.6B/.git
-rm -f Qwen3-0.6B/.gitattributes
-```
-
-**注意**: 
-- 模型文件总大小约 1.2GB，请确保网络稳定
-- 下载的模型目录已被 `.gitignore` 忽略，不会被推送到代码仓库
-- 删除模型目录中的 Git 信息是为了避免仓库嵌套和误提交
-
-### 2. 创建虚拟环境
+### 1. 创建虚拟环境
 
 ```bash
 # 创建虚拟环境
@@ -67,7 +64,7 @@ python -m venv qwen-env
 source qwen-env/bin/activate
 ```
 
-### 3. 安装基础依赖
+### 2. 安装基础依赖
 
 ```bash
 # 更新 pip
@@ -88,17 +85,29 @@ pip install vllm
 
 ## 🚀 快速开始
 
+### 环境安装
+
+1. **运行安装脚本**:
+```bash
+# 使用自动化安装脚本
+./scripts/setup.sh
+
+# 或手动安装
+source qwen-env/bin/activate
+pip install -r requirements.txt
+```
+
 ### 方法一：使用 Transformers（简单）
 
 1. **运行基础推理脚本**:
 ```bash
 source qwen-env/bin/activate
-python test.py
+python tests/test.py
 ```
 
 2. **运行优化推理脚本**:
 ```bash
-python final_test.py
+python tests/final_test.py
 ```
 
 ### 方法二：使用 vLLM（高性能）
@@ -106,7 +115,7 @@ python final_test.py
 1. **启动 vLLM 服务**:
 ```bash
 # 使用脚本启动（推荐）
-./start_vllm.sh
+./scripts/start_vllm.sh
 
 # 或手动启动
 source qwen-env/bin/activate
@@ -120,33 +129,94 @@ INFO:     Uvicorn running on http://0.0.0.0:8000
 
 3. **运行 API 推理**:
 ```bash
-python final_test_vllm.py
+python tests/final_test_vllm.py
 ```
 
 4. **停止 vLLM 服务**:
 ```bash
-./stop_vllm.sh
+./scripts/stop_vllm.sh
+```
+
+### 方法三：使用 MCP 工具调用系统
+
+1. **安装 MCP 工具**:
+```bash
+# 运行 MCP 系统安装
+./scripts/setup.sh
+
+# 安装 MCP 专用依赖
+pip install -r tools/mcp_tools/requirements.txt
+```
+
+2. **启动 vLLM 服务**:
+```bash
+./scripts/start_vllm.sh
+```
+
+3. **测试 MCP 工具调用**:
+```bash
+# 快速测试
+python tools/mcp_tools/test_mcp.py
+
+# 交互模式
+python tools/mcp_tools/mcp_client.py
 ```
 
 ## 🔍 使用优化工具的快速指南
 
-### 快速测试回复质量和时间评估
+### 回复质量和性能优化
 
 #### 1. 运行完整的评估测试
 ```bash
 # 运行综合评估工具（包含时间评估）
-python response_optimizer.py
+python tools/response_optimizer.py
 ```
 
 #### 2. 快速时间评估演示
 ```bash
 # 查看不同响应时间的评估标准
-python simple_time_test.py
+python tests/simple_time_test.py
+```
+
+#### 3. 优化推理引擎
+```bash
+# 使用优化推理引擎
+python tools/optimized_inference.py
+
+# 交互模式
+python tools/optimized_inference.py --interactive
+```
+
+#### 4. MCP 工具调用系统
+
+**支持的工具:**
+- 🧮 `calculate`: 数学计算器
+- 🕒 `get_time`: 时间查询  
+- 📊 `text_analysis`: 文本分析
+- 🌐 `web_search`: 网络搜索（扩展）
+- 📧 `email_tools`: 邮件工具（扩展）
+
+**使用示例:**
+```python
+from tools.mcp_tools.mcp_client import MCPClient
+
+client = MCPClient()
+
+# 数学计算
+result = client.call_tool("calculate", {"expression": "25 * 4 + 10"})
+
+# 获取时间
+time_info = client.call_tool("get_time", {})
+
+# 文本分析
+analysis = client.call_tool("text_analysis", {
+    "text": "这是一段需要分析的文本"
+})
 ```
 
 #### 3. 在代码中使用评估工具
 ```python
-from response_optimizer import QualityEvaluator
+from tools.response_optimizer import QualityEvaluator
 
 evaluator = QualityEvaluator()
 
@@ -445,7 +515,7 @@ snapshot_download(repo_id='Qwen/Qwen3-0.6B', local_dir='./Qwen3-0.6B')
 
 ## 🔧 传统推理方式
 
-### 基础推理脚本 (`test.py`)
+### 基础推理脚本 (`tests/test.py`)
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
@@ -490,7 +560,7 @@ print(f"回答：{generated_text.strip()}")
 ### 运行传统推理
 ```bash
 source qwen-env/bin/activate
-python test.py
+python tests/test.py
 ```
 
 ## 🚀 vLLM高性能推理
@@ -514,7 +584,7 @@ vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 4096 --gpu-memory-utilization 0.8
 ```
 
-### vLLM API调用脚本 (`final_test_vllm.py`)
+### vLLM API调用脚本 (`tests/final_test_vllm.py`)
 ```python
 import requests
 
@@ -550,7 +620,7 @@ vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 
 # 终端2: 调用API推理
 source qwen-env/bin/activate
-python final_test_vllm.py
+python tests/final_test_vllm.py
 ```
 
 ## 🎯 GPU适配说明
@@ -744,7 +814,7 @@ quality_params = {
 
 ### 3. 实时响应时间监控
 
-创建一个实时监控脚本 `time_monitor.py`：
+### 创建一个实时监控脚本 `tools/time_monitor.py`：
 
 ```python
 import time
@@ -1145,7 +1215,7 @@ def evaluate_response_quality(response):
 
 ### 4. 实时优化脚本
 
-创建一个优化的推理脚本 `optimized_inference.py`：
+创建一个优化的推理脚本 `tools/optimized_inference.py`：
 
 ```python
 import requests
@@ -1438,10 +1508,20 @@ vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 
 ## 📝 文件说明
 
-- `test.py`: 传统HuggingFace推理脚本
-- `final_test_vllm.py`: vLLM API调用脚本
+### 主要目录结构
+- `scripts/`: 启动、停止、安装脚本
+- `tests/`: 各种推理测试脚本
+- `tools/`: 优化工具和 MCP 系统
+- `docs/`: 项目文档
 - `Qwen3-0.6B/`: 模型文件目录
-- `qwen-env/`: Python虚拟环境
+- `qwen-env/`: Python 虚拟环境
+
+### 核心文件
+- `tests/test.py`: 传统HuggingFace推理脚本
+- `tests/final_test_vllm.py`: vLLM API调用脚本
+- `tools/optimized_inference.py`: 优化推理引擎
+- `tools/response_optimizer.py`: 回复质量优化工具
+- `tools/mcp_tools/`: MCP 工具调用系统
 
 ## 🎯 最佳实践
 
@@ -1457,7 +1537,7 @@ vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 #### 1. 智能启动脚本
 ```bash
 # 自动检测GPU并选择最优参数
-./start_vllm.sh
+./scripts/start_vllm.sh
 
 # 或者手动指定参数
 vllm serve ./Qwen3-0.6B --dtype half --max-model-len 4096
@@ -1466,18 +1546,18 @@ vllm serve ./Qwen3-0.6B --dtype half --max-model-len 4096
 #### 2. 回复质量优化
 ```bash
 # 使用优化推理脚本
-python optimized_inference.py
+python tools/optimized_inference.py
 
 # 交互模式
-python optimized_inference.py --interactive
+python tools/optimized_inference.py --interactive
 
 # 测试回复优化工具
-python response_optimizer.py
+python tools/response_optimizer.py
 ```
 
 #### 3. 回复质量评估示例
 ```python
-from response_optimizer import ResponseOptimizer, QualityEvaluator
+from tools.response_optimizer import ResponseOptimizer, QualityEvaluator
 
 optimizer = ResponseOptimizer()
 evaluator = QualityEvaluator()
@@ -1520,6 +1600,100 @@ print(f"优化后评分: {new_quality['quality_score']}/10")
 
 ---
 
-**更新日期**: 2025-06-20  
+## 🛠️ MCP 和工具调用功能
+
+### 功能概述
+
+虽然 Qwen3-0.6B 本身不直接支持 MCP 和工具调用，但我们通过外部封装实现了这些功能：
+
+**✅ 已实现功能:**
+- MCP 协议兼容接口
+- 工具函数定义和调用
+- 结构化输出解析
+- 多轮对话工具调用
+- 错误处理和重试机制
+
+**🔧 支持的工具类型:**
+- 🧮 数学计算器
+- 🕒 时间日期查询
+- 📊 文本分析
+- 🌐 网络搜索（可扩展）
+- 📧 邮件工具（可扩展）
+- 🗂️ 文件操作（可扩展）
+
+### 快速使用
+
+1. **安装 MCP 系统**:
+```bash
+./scripts/setup.sh
+pip install -r tools/mcp_tools/requirements.txt
+```
+
+2. **启动服务**:
+```bash
+./scripts/start_vllm.sh
+```
+
+3. **测试工具调用**:
+```bash
+python tools/mcp_tools/test_mcp.py
+```
+
+### 编程接口
+
+```python
+from tools.mcp_tools.mcp_client import MCPClient
+
+# 创建客户端
+client = MCPClient()
+
+# 数学计算
+result = client.call_tool("calculate", {
+    "expression": "25 * 4 + sqrt(16)"
+})
+
+# 获取当前时间
+time_info = client.call_tool("get_time", {})
+
+# 文本分析
+analysis = client.call_tool("text_analysis", {
+    "text": "分析这段文本的情感和关键词",
+    "analyze_sentiment": True,
+    "extract_keywords": True
+})
+
+print(f"计算结果: {result}")
+print(f"当前时间: {time_info}")
+print(f"分析结果: {analysis}")
+```
+
+### 自定义工具
+
+你可以轻松添加自定义工具：
+
+```python
+# 在 tools/mcp_tools/mcp_server.py 中添加新工具
+def weather_query(city: str) -> dict:
+    """查询天气信息"""
+    # 实现天气查询逻辑
+    return {
+        "city": city,
+        "temperature": "25°C",
+        "condition": "晴天"
+    }
+
+# 注册工具
+mcp_server.register_tool("weather", weather_query)
+```
+
+### 架构说明
+
+```
+用户请求 → MCP客户端 → 工具解析器 → Qwen3-0.6B → 工具执行器 → 结果整合 → 返回响应
+```
+
+这个设计让 Qwen3-0.6B 获得了类似原生工具调用的能力，同时保持了灵活性和可扩展性。
+
+**更新日期**: 2025-06-21  
 **作者**: AI助手  
-**版本**: v1.0
+**版本**: v2.0

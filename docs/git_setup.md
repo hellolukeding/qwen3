@@ -6,62 +6,7 @@
 1. **代码仓库** - 推理脚本、评估工具、配置文件等
 2. **模型文件** - 大型模型文件（约1.5GB）需要特殊处理
 
-## 方案0：完全分离模式（当前采用，推荐新手）
-
-### 0.1 原理说明
-- 模型文件完全独立于代码仓库
-- 使用 `.gitignore` 忽略模型目录
-- 用户需要单独下载模型文件
-- 简单、安全、不会误推送大文件
-
-### 0.2 设置步骤
-```bash
-# 1. 确保模型目录被忽略
-echo "Qwen3-0.6B/" >> .gitignore
-
-# 2. 如果已经下载了带有Git信息的模型，清理Git相关文件
-rm -rf Qwen3-0.6B/.git
-rm -f Qwen3-0.6B/.gitattributes
-
-# 3. 验证模型目录被忽略
-git status  # 应该看不到 Qwen3-0.6B 目录
-
-# 4. 在README中说明模型获取方法
-```
-
-### 0.3 用户使用流程
-```bash
-# 1. 克隆代码仓库
-git clone <your-repo-url>
-cd qwen3
-
-# 2. 下载模型文件
-git clone https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct Qwen3-0.6B
-
-# 3. 清理模型的Git信息（避免冲突）
-rm -rf Qwen3-0.6B/.git
-rm -f Qwen3-0.6B/.gitattributes
-
-# 4. 安装依赖并使用
-python -m venv qwen-env
-source qwen-env/bin/activate
-pip install -r requirements.txt
-python test.py
-```
-
-### 0.4 优点
-- ✅ 最简单的设置和使用
-- ✅ 不会误推送大文件
-- ✅ 代码仓库保持轻量
-- ✅ 适合新手和小团队
-- ✅ 避免Git LFS的复杂性
-
-### 0.5 缺点
-- ❌ 用户需要手动下载模型
-- ❌ 模型版本管理需要额外工作
-- ❌ 不适合频繁更新模型的场景
-
-## 方案1：使用Git LFS管理大文件（高级用户）
+## 方案1：使用Git LFS管理大文件（推荐）
 
 ### 1.1 安装Git LFS
 ```bash
