@@ -228,6 +228,4 @@ git clone --filter=blob:none https://github.com/your-repo/qwen3.git
 git lfs pull
 ```
 
-## 自动化脚本
 
-我们还将创建自动化脚本来简化Git管理流程。

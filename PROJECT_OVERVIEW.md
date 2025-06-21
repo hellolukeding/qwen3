@@ -6,6 +6,9 @@
 
 ## 📂 项目结构说明
 
+### 🎯 models/ - 模型文件
+- `Qwen3-0.6B/` - Qwen3-0.6B 模型文件
+
 ### 🚀 scripts/ - 自动化脚本
 - `setup.sh` - 一键环境安装
 - `start_vllm.sh` - vLLM 服务启动

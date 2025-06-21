@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "success_rate": 1.0,
+    "average_score": 78.75,
+    "average_length": 499.8333333333333,
+    "average_time": 39.45655047893524,
+    "truncation_rate": 0.0,
+    "grade": "🥇 良好"
+  },
+  "detailed_results": [
+    {
+      "test": "详细自我介绍测试",
+      "score": 80.0,
+      "config": "analytical",
+      "truncated": false,
+      "time": 34.206095457077026,
+      "length": 395
+    },
+    {
+      "test": "深度知识解释测试",
+      "score": 80.0,
+      "config": "analytical",
+      "truncated": false,
+      "time": 38.234572410583496,
+      "length": 549
+    },
+    {
+      "test": "复杂规划任务测试",
+      "score": 82.5,
+      "config": "long_form",
+      "truncated": false,
+      "time": 51.38620400428772,
+      "length": 681
+    },
+    {
+      "test": "创意写作测试",
+      "score": 80.0,
+      "config": "creative",
+      "truncated": false,
+      "time": 31.73890709877014,
+      "length": 309
+    },
+    {
+      "test": "微调专题测试 - 地主买办阶级残余影响分析",
+      "score": 75.0,
+      "config": "analytical",
+      "truncated": false,
+      "time": 46.48779368400574,
+      "length": 735
+    },
+    {
+      "test": "微调专题测试",
+      "score": 75.0,
+      "config": "analytical",
+      "truncated": false,
+      "time": 34.68573021888733,
+      "length": 330
+    }
+  ]
+}

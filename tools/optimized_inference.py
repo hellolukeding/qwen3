@@ -38,7 +38,7 @@ class OptimizedInference:
         
         # 构建请求
         data = {
-            "model": "./Qwen3-0.6B",
+            "model": "./models/Qwen3-0.6B",
             "prompt": prompt,
             **params
         }

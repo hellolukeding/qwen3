@@ -8,11 +8,12 @@
 qwen3/
 ├── README.md                 # 项目主文档
 ├── requirements.txt         # 依赖包列表
-├── Qwen3-0.6B/              # 模型文件目录
-│   ├── config.json
-│   ├── model.safetensors
-│   ├── tokenizer.json
-│   └── ...
+├── models/                  # 模型文件目录
+│   └── Qwen3-0.6B/          # Qwen3-0.6B 模型
+│       ├── config.json
+│       ├── model.safetensors
+│       ├── tokenizer.json
+│       └── ...
 ├── qwen-env/                # Python 虚拟环境
 ├── scripts/                 # 脚本文件
 │   ├── setup.sh             # 环境安装脚本
@@ -119,7 +120,7 @@ python tests/final_test.py
 
 # 或手动启动
 source qwen-env/bin/activate
-vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
+vllm serve ./models/Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 ```
 
 2. **等待服务启动完成**（约30-60秒），看到类似输出：
@@ -266,25 +267,25 @@ print(f"内容评分: {evaluation['content_evaluation']['content_score']}/10")
 ### RTX 2060/1660 系列（6GB 显存）
 ```bash
 # 使用 float16，减少序列长度
-vllm serve ./Qwen3-0.6B --dtype half --max-model-len 4096 --gpu-memory-utilization 0.8
+vllm serve ./models/Qwen3-0.6B --dtype half --max-model-len 4096 --gpu-memory-utilization 0.8
 ```
 
 ### RTX 3060/4060 系列（8-12GB 显存）
 ```bash
 # 可以使用更长序列
-vllm serve ./Qwen3-0.6B --dtype half --max-model-len 8192 --gpu-memory-utilization 0.9
+vllm serve ./models/Qwen3-0.6B --dtype half --max-model-len 8192 --gpu-memory-utilization 0.9
 ```
 
 ### RTX 3080/4080 系列（10-16GB 显存）
 ```bash
 # 支持 bfloat16 和更长序列
-vllm serve ./Qwen3-0.6B --dtype bfloat16 --max-model-len 16384
+vllm serve ./models/Qwen3-0.6B --dtype bfloat16 --max-model-len 16384
 ```
 
 ### RTX 4090/A100 系列（24GB+ 显存）
 ```bash
 # 最大性能配置
-vllm serve ./Qwen3-0.6B --dtype bfloat16 --max-model-len 32768 --tensor-parallel-size 1
+vllm serve ./models/Qwen3-0.6B --dtype bfloat16 --max-model-len 32768 --tensor-parallel-size 1
 ```
 
 ### 计算能力对照表
@@ -326,14 +327,14 @@ model.generate(
 ```bash
 # 错误: CUDA out of memory
 # 解决: 减少 max_model_len 或增加 gpu_memory_utilization
-vllm serve ./Qwen3-0.6B --dtype half --max-model-len 2048 --gpu-memory-utilization 0.7
+vllm serve ./models/Qwen3-0.6B --dtype half --max-model-len 2048 --gpu-memory-utilization 0.7
 ```
 
 ### 2. bfloat16 不支持
 ```bash
 # 错误: Bfloat16 is only supported on GPUs with compute capability >= 8.0
 # 解决: 使用 half 代替 bfloat16
-vllm serve ./Qwen3-0.6B --dtype half
+vllm serve ./models/Qwen3-0.6B --dtype half
 ```
 
 ### 3. 模型加载失败
@@ -348,7 +349,7 @@ ls -la Qwen3-0.6B/
 # 检查端口占用
 lsof -i :8000
 # 杀死占用进程或更换端口
-vllm serve ./Qwen3-0.6B --port 8001
+vllm serve ./models/Qwen3-0.6B --port 8001
 ```
 
 ## 📊 性能对比
@@ -366,7 +367,7 @@ vllm serve ./Qwen3-0.6B --port 8001
 import requests
 
 response = requests.post("http://localhost:8000/v1/completions", json={
-    "model": "./Qwen3-0.6B",
+    "model": "./models/Qwen3-0.6B",
     "prompt": "什么是人工智能？",
     "max_tokens": 100,
     "temperature": 0.7
@@ -498,7 +499,7 @@ git lfs install
 git clone https://huggingface.co/Qwen/Qwen3-0.6B
 
 # 重命名文件夹
-mv Qwen3-0.6B ./Qwen3-0.6B
+mv Qwen3-0.6B ./models/Qwen3-0.6B
 ```
 
 ### 方式2: 使用huggingface-hub
@@ -509,7 +510,7 @@ pip install huggingface-hub
 # Python脚本下载
 python -c "
 from huggingface_hub import snapshot_download
-snapshot_download(repo_id='Qwen/Qwen3-0.6B', local_dir='./Qwen3-0.6B')
+snapshot_download(repo_id='Qwen/Qwen3-0.6B', local_dir='./models/Qwen3-0.6B')
 "
 ```
 
@@ -520,7 +521,7 @@ snapshot_download(repo_id='Qwen/Qwen3-0.6B', local_dir='./Qwen3-0.6B')
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-model_id = "./Qwen3-0.6B"
+model_id = "./models/Qwen3-0.6B"
 tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_id, 
@@ -571,17 +572,17 @@ python tests/test.py
 
 **RTX 3090/4090 等 (计算能力 ≥ 8.0)**
 ```bash
-vllm serve ./Qwen3-0.6B --dtype bfloat16 --port 8000 --max-model-len 8192
+vllm serve ./models/Qwen3-0.6B --dtype bfloat16 --port 8000 --max-model-len 8192
 ```
 
 **RTX 2060/2070/2080 等 (计算能力 7.5)**
 ```bash
-vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
+vllm serve ./models/Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 ```
 
 **显存不足时 (4GB以下)**
 ```bash
-vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 4096 --gpu-memory-utilization 0.8
+vllm serve ./models/Qwen3-0.6B --dtype half --port 8000 --max-model-len 4096 --gpu-memory-utilization 0.8
 ```
 
 ### vLLM API调用脚本 (`tests/final_test_vllm.py`)
@@ -591,7 +592,7 @@ import requests
 url = "http://localhost:8000/v1/completions"
 headers = {"Content-Type": "application/json"}
 data = {
-    "model": "./Qwen3-0.6B",
+    "model": "./models/Qwen3-0.6B",
     "prompt": "请简要介绍引力的原理。",
     "max_tokens": 100,
     "temperature": 0.6,
@@ -616,7 +617,7 @@ else:
 ```bash
 # 终端1: 启动vLLM服务
 source qwen-env/bin/activate
-vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
+vllm serve ./models/Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
 
 # 终端2: 调用API推理
 source qwen-env/bin/activate
@@ -1261,7 +1262,7 @@ class OptimizedInference:
         
         # 构建请求
         data = {
-            "model": "./Qwen3-0.6B",
+            "model": "./models/Qwen3-0.6B",
             "prompt": prompt,
             **params
         }
@@ -1456,243 +1457,456 @@ def ab_test_parameters():
 
 这些优化策略将帮助你获得更高质量、更相关且无重复的模型回复。
 
-## ❓ 常见问题
+## 🎯 LoRA 微调模型使用指南
 
-### Q1: 报错 "Import torch could not be resolved"
-**A:** 重新安装PyTorch
+### 微调训练完成后的模型使用
+
+#### 1. 快速开始微调训练
+
 ```bash
-pip uninstall torch
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+# 环境验证
+./scripts/verify_env.sh
+
+# 小显存优化训练（适用于 RTX 2060 6GB）
+./scripts/train_lowmem.sh
+
+# 简单测试训练
+./scripts/test_simple.sh
 ```
 
-### Q2: 报错 "Bfloat16 is only supported on GPUs with compute capability of at least 8.0"
-**A:** 改用half精度
-```bash
-# vLLM启动时使用
---dtype half
+#### 2. 加载和使用微调模型
 
-# Transformers中使用
-torch_dtype=torch.float16
-```
-
-### Q3: 报错 "CUDA out of memory"
-**A:** 减少max_model_len或使用更小batch size
-```bash
-# 减少序列长度
---max-model-len 4096
-
-# 减少GPU内存使用
---gpu-memory-utilization 0.7
-```
-
-### Q4: vLLM服务启动失败
-**A:** 检查端口占用和依赖安装
-```bash
-# 检查端口
-lsof -i :8000
-
-# 杀死占用进程
-pkill -f vllm
-
-# 重新启动
-vllm serve ./Qwen3-0.6B --dtype half --port 8000 --max-model-len 8192
-```
-
-### Q5: 生成结果重复
-**A:** 调整重复惩罚参数
-```python
-# 增加重复惩罚
-"repetition_penalty": 1.2,
-"no_repeat_ngram_size": 3
-```
-
-## 📝 文件说明
-
-### 主要目录结构
-- `scripts/`: 启动、停止、安装脚本
-- `tests/`: 各种推理测试脚本
-- `tools/`: 优化工具和 MCP 系统
-- `docs/`: 项目文档
-- `Qwen3-0.6B/`: 模型文件目录
-- `qwen-env/`: Python 虚拟环境
-
-### 核心文件
-- `tests/test.py`: 传统HuggingFace推理脚本
-- `tests/final_test_vllm.py`: vLLM API调用脚本
-- `tools/optimized_inference.py`: 优化推理引擎
-- `tools/response_optimizer.py`: 回复质量优化工具
-- `tools/mcp_tools/`: MCP 工具调用系统
-
-## 🎯 最佳实践
-
-### 开发流程建议
-
-1. **开发阶段**: 使用Transformers方式，便于调试和实验
-2. **性能测试**: 使用vLLM获得生产级性能
-3. **质量优化**: 使用内置的回复优化工具
-4. **批量处理**: 利用vLLM的并发能力
-
-### 使用优化工具
-
-#### 1. 智能启动脚本
-```bash
-# 自动检测GPU并选择最优参数
-./scripts/start_vllm.sh
-
-# 或者手动指定参数
-vllm serve ./Qwen3-0.6B --dtype half --max-model-len 4096
-```
-
-#### 2. 回复质量优化
-```bash
-# 使用优化推理脚本
-python tools/optimized_inference.py
-
-# 交互模式
-python tools/optimized_inference.py --interactive
-
-# 测试回复优化工具
-python tools/response_optimizer.py
-```
-
-#### 3. 回复质量评估示例
-```python
-from tools.response_optimizer import ResponseOptimizer, QualityEvaluator
-
-optimizer = ResponseOptimizer()
-evaluator = QualityEvaluator()
-
-# 原始回复
-response = "答案：AI是人工智能。AI是人工智能。它很有用。"
-
-# 质量评估
-quality = evaluator.evaluate(response)
-print(f"质量评分: {quality['quality_score']}/10")
-print(f"问题: {quality['issues']}")
-
-# 优化回复
-optimized = optimizer.clean_response(response)
-print(f"优化后: {optimized}")
-
-# 重新评估
-new_quality = evaluator.evaluate(optimized)
-print(f"优化后评分: {new_quality['quality_score']}/10")
-```
-
-## 📊 回复质量优化技巧总结
-
-| 问题类型   | 症状           | 解决方案                                             |
-| ---------- | -------------- | ---------------------------------------------------- |
-| 内容重复   | 句子或短语重复 | 增加`repetition_penalty`，使用`no_repeat_ngram_size` |
-| 回复过短   | 信息不完整     | 增加`max_tokens`，优化prompt引导                     |
-| 回复过长   | 冗余信息过多   | 减少`max_tokens`，添加适当的停止词                   |
-| 话题偏离   | 回答不相关     | 优化prompt结构，明确任务要求                         |
-| 语法不完整 | 句子中断       | 改进停止词设置，后处理补全                           |
-| 质量不稳定 | 时好时坏       | 使用固定种子，标准化prompt格式                       |
-
-## 📞 技术支持
-
-如遇到问题，请检查：
-1. GPU驱动和CUDA版本是否匹配
-2. Python环境和依赖是否正确安装
-3. 模型文件是否完整下载
-4. 显存是否足够
-
----
-
-## 🛠️ MCP 和工具调用功能
-
-### 功能概述
-
-虽然 Qwen3-0.6B 本身不直接支持 MCP 和工具调用，但我们通过外部封装实现了这些功能：
-
-**✅ 已实现功能:**
-- MCP 协议兼容接口
-- 工具函数定义和调用
-- 结构化输出解析
-- 多轮对话工具调用
-- 错误处理和重试机制
-
-**🔧 支持的工具类型:**
-- 🧮 数学计算器
-- 🕒 时间日期查询
-- 📊 文本分析
-- 🌐 网络搜索（可扩展）
-- 📧 邮件工具（可扩展）
-- 🗂️ 文件操作（可扩展）
-
-### 快速使用
-
-1. **安装 MCP 系统**:
-```bash
-./scripts/setup.sh
-pip install -r tools/mcp_tools/requirements.txt
-```
-
-2. **启动服务**:
-```bash
-./scripts/start_vllm.sh
-```
-
-3. **测试工具调用**:
-```bash
-python tools/mcp_tools/test_mcp.py
-```
-
-### 编程接口
+**Python 代码示例：**
 
 ```python
-from tools.mcp_tools.mcp_client import MCPClient
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
-# 创建客户端
-client = MCPClient()
+def load_finetuned_model(base_model_path, adapter_path):
+    """加载微调后的 LoRA 模型"""
+    print("加载基础模型和分词器...")
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
+    
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        trust_remote_code=True,
+        device_map="auto",
+        torch_dtype=torch.bfloat16,  # RTX 2060用torch.float16
+        low_cpu_mem_usage=True
+    )
+    
+    print("加载 LoRA 适配器...")
+    model = PeftModel.from_pretrained(base_model, adapter_path)
+    
+    return model, tokenizer
 
-# 数学计算
-result = client.call_tool("calculate", {
-    "expression": "25 * 4 + sqrt(16)"
-})
+def chat_with_model(model, tokenizer, user_input, system_prompt="你是一个有用的AI助手。"):
+    """与微调模型对话"""
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_input}
+    ]
+    
+    text = tokenizer.apply_chat_template(
+        messages, 
+        tokenize=False, 
+        add_generation_prompt=True
+    )
+    
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=512,
+            temperature=0.7,
+            do_sample=True,
+            pad_token_id=tokenizer.eos_token_id,
+            eos_token_id=tokenizer.eos_token_id
+        )
+    
+    response = tokenizer.decode(
+        outputs[0][inputs['input_ids'].shape[1]:], 
+        skip_special_tokens=True
+    )
+    
+    return response
 
-# 获取当前时间
-time_info = client.call_tool("get_time", {})
-
-# 文本分析
-analysis = client.call_tool("text_analysis", {
-    "text": "分析这段文本的情感和关键词",
-    "analyze_sentiment": True,
-    "extract_keywords": True
-})
-
-print(f"计算结果: {result}")
-print(f"当前时间: {time_info}")
-print(f"分析结果: {analysis}")
+# 使用示例
+if __name__ == "__main__":
+    base_model_path = "./models/Qwen3-0.6B"
+    adapter_path = "./output/qwen3-lora-lowmem-20250621-195657"  # 替换为你的模型路径
+    
+    model, tokenizer = load_finetuned_model(base_model_path, adapter_path)
+    
+    # 测试对话
+    response = chat_with_model(model, tokenizer, "你好，请介绍一下自己。")
+    print(f"AI: {response}")
 ```
 
-### 自定义工具
+#### 3. 模型验证和测试脚本
 
-你可以轻松添加自定义工具：
+**创建验证脚本：**
+
+```bash
+# 创建模型验证脚本
+cat > scripts/validate_model.sh << 'EOF'
+#!/bin/bash
+# 微调模型验证脚本
+
+MODEL_PATH=${1:-"./output/qwen3-lora-lowmem-$(date +%Y%m%d-*)*"}
+
+echo "🔍 验证微调模型: $MODEL_PATH"
+
+# 检查模型文件
+if [ ! -d "$MODEL_PATH" ]; then
+    echo "❌ 模型目录不存在: $MODEL_PATH"
+    echo "请指定正确的模型路径，例如:"
+    echo "  ./scripts/validate_model.sh ./output/qwen3-lora-lowmem-20250621-195657"
+    exit 1
+fi
+
+echo "✅ 模型目录存在"
+
+# 检查必需文件
+required_files=("adapter_config.json" "adapter_model.safetensors")
+for file in "${required_files[@]}"; do
+    if [ -f "$MODEL_PATH/$file" ]; then
+        echo "✅ $file 存在"
+    else
+        echo "❌ $file 缺失"
+    fi
+done
+
+# 运行 Python 验证
+uv run python -c "
+import sys
+sys.path.append('.')
+
+try:
+    from scripts.test_finetuned_model import test_model
+    test_model('$MODEL_PATH')
+    print('🎉 模型验证完成!')
+except Exception as e:
+    print(f'❌ 验证失败: {e}')
+    sys.exit(1)
+"
+
+echo "模型验证完成！"
+EOF
+
+chmod +x scripts/validate_model.sh
+```
+
+#### 4. 创建模型测试脚本
 
 ```python
-# 在 tools/mcp_tools/mcp_server.py 中添加新工具
-def weather_query(city: str) -> dict:
-    """查询天气信息"""
-    # 实现天气查询逻辑
-    return {
-        "city": city,
-        "temperature": "25°C",
-        "condition": "晴天"
-    }
+# scripts/test_finetuned_model.py
+import torch
+import sys
+import os
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
-# 注册工具
-mcp_server.register_tool("weather", weather_query)
+def test_model(adapter_path):
+    """测试微调模型的功能"""
+    print(f"🧪 测试模型: {adapter_path}")
+    
+    base_model_path = "./models/Qwen3-0.6B"
+    
+    try:
+        # 加载模型
+        print("📦 加载基础模型...")
+        tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
+        base_model = AutoModelForCausalLM.from_pretrained(
+            base_model_path,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            trust_remote_code=True
+        )
+        
+        print("🔧 加载 LoRA 适配器...")
+        model = PeftModel.from_pretrained(base_model, adapter_path)
+        
+        # 测试对话
+        test_cases = [
+            "你好，请介绍一下自己。",
+            "1+1等于多少？",
+            "请解释一下什么是人工智能。",
+            "写一首关于春天的诗。"
+        ]
+        
+        print("💬 开始对话测试...")
+        for i, user_input in enumerate(test_cases, 1):
+            print(f"\n--- 测试 {i} ---")
+            print(f"用户: {user_input}")
+            
+            messages = [
+                {"role": "system", "content": "你是一个有用的AI助手。"},
+                {"role": "user", "content": user_input}
+            ]
+            
+            text = tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+            inputs = tokenizer(text, return_tensors="pt").to(model.device)
+            
+            with torch.no_grad():
+                outputs = model.generate(
+                    **inputs,
+                    max_new_tokens=200,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=tokenizer.eos_token_id
+                )
+            
+            response = tokenizer.decode(
+                outputs[0][inputs['input_ids'].shape[1]:], 
+                skip_special_tokens=True
+            )
+            
+            print(f"AI: {response}")
+        
+        print("\n✅ 模型测试完成！")
+        
+        # 显示模型信息
+        print("\n📊 模型信息:")
+        if hasattr(model, 'print_trainable_parameters'):
+            model.print_trainable_parameters()
+        
+        # 内存使用情况
+        if torch.cuda.is_available():
+            memory_used = torch.cuda.memory_allocated() / 1e9
+            print(f"GPU 内存使用: {memory_used:.2f} GB")
+        
+    except Exception as e:
+        print(f"❌ 测试失败: {e}")
+        raise
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("用法: python scripts/test_finetuned_model.py <模型路径>")
+        sys.exit(1)
+    
+    model_path = sys.argv[1]
+    test_model(model_path)
 ```
 
-### 架构说明
+#### 5. 交互式对话脚本
 
+```python
+# scripts/chat_with_finetuned.py
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
+
+def interactive_chat(adapter_path):
+    """交互式对话"""
+    base_model_path = "./models/Qwen3-0.6B"
+    
+    print("🚀 加载微调模型...")
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        torch_dtype=torch.float16,
+        device_map="auto",
+        trust_remote_code=True
+    )
+    
+    model = PeftModel.from_pretrained(base_model, adapter_path)
+    print("✅ 模型加载完成！")
+    
+    print("\n💬 开始对话（输入 'exit' 退出）:")
+    
+    while True:
+        user_input = input("\n你: ").strip()
+        
+        if user_input.lower() in ['exit', 'quit', '退出']:
+            print("👋 对话结束！")
+            break
+        
+        if not user_input:
+            continue
+        
+        messages = [
+            {"role": "system", "content": "你是一个有用的AI助手。"},
+            {"role": "user", "content": user_input}
+        ]
+        
+        text = tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        inputs = tokenizer(text, return_tensors="pt").to(model.device)
+        
+        print("AI: ", end="", flush=True)
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_new_tokens=512,
+                temperature=0.7,
+                do_sample=True,
+                pad_token_id=tokenizer.eos_token_id,
+                do_sample=True
+            )
+        
+        response = tokenizer.decode(
+            outputs[0][inputs['input_ids'].shape[1]:], 
+            skip_special_tokens=True
+        )
+        
+        print(response)
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("用法: python scripts/chat_with_finetuned.py <模型路径>")
+        print("示例: python scripts/chat_with_finetuned.py ./output/qwen3-lora-lowmem-20250621-195657")
+        sys.exit(1)
+    
+    model_path = sys.argv[1]
+    interactive_chat(model_path)
 ```
-用户请求 → MCP客户端 → 工具解析器 → Qwen3-0.6B → 工具执行器 → 结果整合 → 返回响应
+
+#### 6. 使用命令示例
+
+```bash
+# 验证微调模型
+./scripts/validate_model.sh ./output/qwen3-lora-lowmem-20250621-195657
+
+# 测试模型功能
+uv run python scripts/test_finetuned_model.py ./output/qwen3-lora-lowmem-20250621-195657
+
+# 交互式对话
+uv run python scripts/chat_with_finetuned.py ./output/qwen3-lora-lowmem-20250621-195657
+
+# 监控GPU使用
+./scripts/monitor_gpu.sh
 ```
 
-这个设计让 Qwen3-0.6B 获得了类似原生工具调用的能力，同时保持了灵活性和可扩展性。
+### 选项2: API服务
+```bash
+# 创建简单的FastAPI服务
+cat > serve_finetuned.py << 'EOF'
+from fastapi import FastAPI
+from pydantic import BaseModel
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 
-**更新日期**: 2025-06-21   
-**版本**: v0.0.1
+app = FastAPI()
+
+class ChatRequest(BaseModel):
+    message: str
+    temperature: float = 0.7
+
+# 全局加载模型
+model = None
+tokenizer = None
+
+@app.on_event("startup")
+async def load_model():
+    global model, tokenizer
+    base_model_path = "./models/Qwen3-0.6B"
+    adapter_path = "./output/qwen3-lora-lowmem-20250621-195657"
+    
+    tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
+    base_model = AutoModelForCausalLM.from_pretrained(
+        base_model_path,
+        torch_dtype=torch.float16,
+        device_map="auto",
+        trust_remote_code=True
+    )
+    model = PeftModel.from_pretrained(base_model, adapter_path)
+
+@app.post("/chat")
+async def chat(request: ChatRequest):
+    messages = [{"role": "user", "content": request.message}]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=200,
+            temperature=request.temperature
+        )
+    
+    response = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+    return {"response": response}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+EOF
+
+# 启动服务
+uv run python serve_finetuned.py
+```
+
+### 选项3: Gradio界面
+```bash
+# 创建Web界面
+cat > gradio_chat.py << 'EOF'
+import gradio as gr
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
+
+# 加载模型
+base_model_path = "./models/Qwen3-0.6B"
+adapter_path = "./output/qwen3-lora-lowmem-20250621-195657"
+
+tokenizer = AutoTokenizer.from_pretrained(base_model_path, trust_remote_code=True)
+base_model = AutoModelForCausalLM.from_pretrained(
+    base_model_path,
+    torch_dtype=torch.float16,
+    device_map="auto",
+    trust_remote_code=True
+)
+model = PeftModel.from_pretrained(base_model, adapter_path)
+
+def chat_fn(message, history, temperature):
+    messages = [{"role": "user", "content": message}]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_new_tokens=200,
+            temperature=temperature
+        )
+    
+    response = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+    history.append([message, response])
+    return "", history
+
+with gr.Blocks(title="Qwen3 微调模型") as demo:
+    gr.Markdown("# 🤖 Qwen3-0.6B LoRA 微调模型对话界面")
+    
+    chatbot = gr.Chatbot()
+    msg = gr.Textbox(label="输入消息")
+    temperature = gr.Slider(0.1, 2.0, value=0.7, label="温度")
+    clear = gr.Button("清除")
+    
+    msg.submit(chat_fn, [msg, chatbot, temperature], [msg, chatbot])
+    clear.click(lambda: ([], ""), outputs=[chatbot, msg])
+
+demo.launch(server_name="0.0.0.0", server_port=7860)
+EOF
+
+# 安装并启动
+uv add gradio
+uv run python gradio_chat.py
+```
+
+## 🚀 下一步优化建议
+
+1. **增加训练数据**: 扩展数据集以提升模型能力
+2. **调整超参数**: 尝试不同的学习率和LoRA配置
+3. **多轮对话**: 实现上下文记忆功能
+4. **专业化微调**: 针对特定领域进行专门训练
+5. **量化部署**: 使用INT8/INT4量化进一步减少内存使用
+
+恭喜你成功完成了 Qwen3-0.6B 的 LoRA 微调！🎉

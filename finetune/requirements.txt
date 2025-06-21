@@ -1,0 +1,8 @@
+# 微调所需的额外依赖包
+peft>=0.7.0
+datasets>=2.14.0
+tensorboard>=2.13.0
+wandb>=0.15.0  # 可选：用于实验跟踪
+bitsandbytes>=0.41.0  # 可选：用于量化训练
+scipy>=1.10.0
+scikit-learn>=1.3.0

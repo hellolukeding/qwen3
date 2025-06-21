@@ -350,7 +350,7 @@ class PerformanceBenchmark:
         """单次测试"""
         
         data = {
-            "model": "./Qwen3-0.6B",
+            "model": "./models/Qwen3-0.6B",
             "prompt": prompt,
             "max_tokens": 100,
             "temperature": 0.7,

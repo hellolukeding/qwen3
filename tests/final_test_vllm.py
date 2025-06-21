@@ -9,7 +9,7 @@ def test_vllm_api():
     
     # 优化的推理参数
     data = {
-        "model": "./Qwen3-0.6B",
+        "model": "./models/Qwen3-0.6B",
         "prompt": "请简要介绍引力的原理。",
         "max_tokens": 80,           # 减少生成长度，提高速度
         "temperature": 0.7,         # 适中的随机性

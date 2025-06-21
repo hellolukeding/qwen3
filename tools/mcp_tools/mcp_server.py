@@ -286,7 +286,7 @@ class MCPServer:
             response = requests.post(
                 f"{self.qwen_url}/v1/completions",
                 json={
-                    "model": "./Qwen3-0.6B",
+                    "model": "./models/Qwen3-0.6B",
                     "prompt": prompt,
                     "max_tokens": 300,
                     "temperature": 0.7,
@@ -339,7 +339,7 @@ class MCPServer:
                 final_response_req = requests.post(
                     f"{self.qwen_url}/v1/completions",
                     json={
-                        "model": "./Qwen3-0.6B",
+                        "model": "./models/Qwen3-0.6B",
                         "prompt": final_prompt,
                         "max_tokens": 200,
                         "temperature": 0.6

@@ -45,7 +45,7 @@ echo "启动vLLM服务..."
 echo "参数: --dtype $DTYPE --max-model-len $MAX_LEN --gpu-memory-utilization $GPU_UTIL"
 
 # 启动vLLM服务
-nohup vllm serve ./Qwen3-0.6B \
+nohup vllm serve ./models/Qwen3-0.6B \
     --dtype $DTYPE \
     --port 8000 \
     --max-model-len $MAX_LEN \

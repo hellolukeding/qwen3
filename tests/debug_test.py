@@ -5,7 +5,7 @@ import torch
 print("开始加载模型...")
 start_time = time.time()
 
-model_id = "./Qwen3-0.6B"
+model_id = "./models/Qwen3-0.6B"
 tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 print(f"Tokenizer加载完成，耗时: {time.time() - start_time:.2f}s")
 
