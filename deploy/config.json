@@ -1,0 +1,8 @@
+{
+    "model_path": "../output/qwen3-lora-lowmem-20250621-195657",
+    "base_model_path": "../models/Qwen3-0.6B",
+    "port": 8000,
+    "host": "0.0.0.0",
+    "deployment_time": "2025-06-24T22:12:00+08:00",
+    "gpu_info": "NVIDIA GeForce RTX 3060 Laptop GPU, 6144"
+}
