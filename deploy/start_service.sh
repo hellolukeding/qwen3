@@ -33,23 +33,33 @@ echo "📁 模型路径: $MODEL_PATH"
 
 # 根据显存大小设置参数
 if [ $GPU_MEMORY -lt 6000 ]; then
-    # 小于6GB显存
+    # 小于6GB显存 - 极度保守配置
+    DTYPE="half"
+    MAX_LEN="1024"
+    GPU_UTIL="0.6"
+    MAX_NUM_SEQS="64"
+    echo "📉 使用小显存配置（极度保守）"
+elif [ $GPU_MEMORY -lt 8000 ]; then
+    # 6-8GB显存 - 保守配置（RTX 3060 6GB 属于这个范围）
     DTYPE="half"
     MAX_LEN="2048"
     GPU_UTIL="0.7"
-    echo "📉 使用小显存配置"
+    MAX_NUM_SEQS="128"
+    echo "� 使用中等显存配置（保守）"
 elif [ $GPU_MEMORY -lt 12000 ]; then
-    # 6-12GB显存
+    # 8-12GB显存
     DTYPE="half"
     MAX_LEN="4096"
     GPU_UTIL="0.8"
-    echo "📊 使用中等显存配置"
+    MAX_NUM_SEQS="256"
+    echo "� 使用中等显存配置"
 else
     # 大于12GB显存
     DTYPE="bfloat16"
     MAX_LEN="8192"
     GPU_UTIL="0.9"
-    echo "📈 使用大显存配置"
+    MAX_NUM_SEQS="512"
+    echo "� 使用大显存配置"
 fi
 
 # 检查端口是否被占用
@@ -61,7 +71,7 @@ fi
 
 echo "🚀 启动 vLLM 服务..."
 echo "   📡 地址: $HOST:$PORT"
-echo "   🔧 参数: --dtype $DTYPE --max-model-len $MAX_LEN --gpu-memory-utilization $GPU_UTIL"
+echo "   🔧 参数: --dtype $DTYPE --max-model-len $MAX_LEN --gpu-memory-utilization $GPU_UTIL --max-num-seqs $MAX_NUM_SEQS"
 
 # 检查是否是 LoRA 微调模型
 if [ -f "$MODEL_PATH/adapter_config.json" ]; then
@@ -75,6 +85,7 @@ if [ -f "$MODEL_PATH/adapter_config.json" ]; then
         --host $HOST \
         --port $PORT \
         --max-model-len $MAX_LEN \
+        --max-num-seqs $MAX_NUM_SEQS \
         --gpu-memory-utilization $GPU_UTIL \
         --disable-log-requests \
         --trust-remote-code \
@@ -88,6 +99,7 @@ else
         --host $HOST \
         --port $PORT \
         --max-model-len $MAX_LEN \
+        --max-num-seqs $MAX_NUM_SEQS \
         --gpu-memory-utilization $GPU_UTIL \
         --disable-log-requests \
         --trust-remote-code \
