@@ -1,0 +1,6 @@
+/models
+/output
+# /datasets
+/finetune
+/merged
+.venv

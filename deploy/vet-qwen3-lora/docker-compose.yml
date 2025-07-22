@@ -1,0 +1,28 @@
+version: "3.8"
+
+networks:
+  1panel-network:
+    external: true
+
+services:
+  vllm:
+    image: vllm/vllm-openai:v0.9.2
+    container_name: ${CONTAINER_NAME}
+    command: --model /model/merged/${MODEL} --served-model-name ${MODEL} --api-key ${API_KEY} --host 0.0.0.0 --port 8000 --trust-remote-code --gpu-memory-utilization 0.8 --max-model-len 2048
+    environment:
+      - HF_ENDPOINT=https://hf-mirror.com
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - VLLM_LOGGING_LEVEL=INFO
+    volumes:
+      - ./cache/huggingface:/root/.cache/huggingface
+      - /home/ubuntu/Desktop/qwen3/models:/model
+      - /home/ubuntu/Desktop/qwen3/merged:/model/merged
+    ports:
+      - ${HOST_IP}:${PANEL_APP_PORT_HTTP}:8000
+    ipc: host
+    networks:
+      - 1panel-network
+    restart: always
+    runtime: nvidia
