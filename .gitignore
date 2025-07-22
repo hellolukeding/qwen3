@@ -4,3 +4,4 @@
 /finetune
 /merged
 .venv
+/deploy/vet-qwen3-lora/.env
